@@ -7,11 +7,15 @@
 //
 
 #import "STTwitterAPI.h"
+#if !TARGET_OS_TV
 #import "STTwitterOS.h"
+#endif
 #import "STTwitterOAuth.h"
 #import "NSString+STTwitter.h"
 #import "STTwitterAppOnly.h"
+#if !TARGET_OS_TV
 #import <Accounts/Accounts.h>
+#endif
 #import "STHTTPRequest.h"
 #import "STHTTPRequest+STTwitter.h"
 
@@ -34,9 +38,9 @@ static NSDateFormatter *dateFormatter = nil;
 
 - (instancetype)init {
     self = [super init];
-    
+#if !TARGET_OS_TV
     __weak typeof(self) weakSelf = self;
-    
+
     self.observer = [[NSNotificationCenter defaultCenter] addObserverForName:ACAccountStoreDidChangeNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
         
         if(weakSelf == nil) return;
@@ -59,7 +63,7 @@ static NSDateFormatter *dateFormatter = nil;
             }];
         }
     }];
-    
+#endif
     NSLog(@"-- %@", _observer);
     
     return self;
@@ -67,9 +71,9 @@ static NSDateFormatter *dateFormatter = nil;
 
 - (void)dealloc {
     self.oauth = nil;
-    
+#if !TARGET_OS_TV
     [[NSNotificationCenter defaultCenter] removeObserver:_observer name:ACAccountStoreDidChangeNotification object:nil];
-    
+#endif
     self.delegate = nil;
     self.observer = nil;
 }
@@ -77,7 +81,7 @@ static NSDateFormatter *dateFormatter = nil;
 + (NSString *)versionString {
     return @"0.2.2";
 }
-
+#if !TARGET_OS_TV
 + (instancetype)twitterAPIOSWithAccount:(ACAccount *)account delegate:(NSObject <STTwitterAPIOSProtocol> *)delegate {
     STTwitterAPI *twitter = [[STTwitterAPI alloc] init];
     twitter.oauth = [STTwitterOS twitterAPIOSWithAccount:account];
@@ -98,7 +102,7 @@ static NSDateFormatter *dateFormatter = nil;
 + (instancetype)twitterAPIOSWithFirstAccount __deprecated_msg("use twitterAPIOSWithFirstAccountAndDelegate:") {
     return [self twitterAPIOSWithFirstAccountAndDelegate:nil];
 }
-
+#endif
 + (instancetype)twitterAPIWithOAuthConsumerName:(NSString *)consumerName
                                     consumerKey:(NSString *)consumerKey
                                  consumerSecret:(NSString *)consumerSecret
@@ -336,22 +340,22 @@ authenticateInsteadOfAuthorize:authenticateInsteadOfAuthorize
 }
 
 - (NSString *)userName {
-    
+#if !TARGET_OS_TV
     if([_oauth isKindOfClass:[STTwitterOS class]]) {
         STTwitterOS *twitterOS = (STTwitterOS *)_oauth;
         return twitterOS.username;
     }
-    
+#endif
     return _userName;
 }
 
 - (NSString *)userID {
-    
+#if !TARGET_OS_TV
     if([_oauth isKindOfClass:[STTwitterOS class]]) {
         STTwitterOS *twitterOS = (STTwitterOS *)_oauth;
         return twitterOS.userID;
     }
-    
+#endif
     return _userID;
 }
 
